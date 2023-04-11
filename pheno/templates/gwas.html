@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block headerblock %}
+    <link rel="stylesheet" href="{% static 'css/dataTables.bootstrap5.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/datatables.bootstrap5.css' %}"/>
+{% endblock %}
+{% block page_content %}
+    <div class="container-fluid p-4">
+        <div class="row row-cols-2">
+            <div class="col-12"><h1>{{ pheno.phecode }}: {{ pheno.phenotype.title }}</h1></div>
+            <div class="col-6"><h6><b>{{ pheno.cases }}</b> Cases, <b>{{ pheno.controls }}</b> Controls</h6>
+                <h6>Category: <b>{{ pheno.category.title }}</b></h6></div>
+            <div class="col-4 text-end"><a class="btn btn-outline-secondary" href="/download_summary/{{ phecode }}" download role="button">Download Summary Statistics</a></div>
+            <div class="col-2 text-start"><a class="btn btn-outline-secondary" href="/download_manhattan/{{ phecode }}" download role="button">Download Interactive Plot</a></div>
+        </div>
+    </div>
+    {{ graph|safe }}
+    <div class="container-fluid p-4">
+        <h2>Genome Wide Significant Variants</h2>
+        <table class="table table-striped table-bordered" id="variants">
+            <thead>
+                <tr>
+                    <th scope="col">Variant</th>
+                    <th scope="col">Nearest Gene(s)</th>
+                    <th scope="col">MAF</th>
+                    <th scope="col">P-Value</th>
+                    <th scope="col">Effect Size (SE)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                    <tr>
+                        <td><a href="/variant/{{ result.var_id }}" style="text-decoration: none">{{ result.var_id }}</a></td>
+                        <td>{{ result.gene }}</td>
+                        <td>{{ result.maf|stringformat:".3f" }}</td>
+                        <td>{{ result.p_value|stringformat:".2e" }}</td>
+                        <td>{{ result.effectsize }} ({{ result.se }})</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{#    {% endfor %}#}
+{#    {% for result in results %}#}
+{#        <p>{{ result.var_id }} {{ result.log10p }}</p>#}
+{#    {% endfor %}#}
+{% endblock %}
+{% block end_content %}
+{#    <script type="text/javascript" src="{% static 'js/jquery-3.6.1.min.js' %}"></script>#}
+    <script type="text/javascript" src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dataTables.bootstrap5.min.js' %}"></script>
+    <script>
+        $(document).ready(function() {
+            $('#variants').DataTable({
+                order: [[3, 'asc']],
+                pagingType: 'full_numbers',
+                // dom: '<"top"fBl>rt<"bottom"ip><"clear">',
+                // "language": {
+                //     "search": '',
+                //     "searchPlaceholder": 'Search FTO, Type 2 Diabetes, etc...'
+                // }
+            });
+        });
+    </script>
+{% endblock %}

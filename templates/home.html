@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block page_content %}
+    <div class="d-flex align-items-center justify-content-center" style="padding-top: 25vh">
+        <h1>Unified Nexus of Genetic Association Tests on EHR Data</h1>
+    </div>
+    <div class="d-flex align-items-center justify-content-center">
+        <form class="w-50" id="searchbar" type="search" action="{% url 'go' %}" method="get" autocomplete="off">
+            <input class="form-control typeahead" type="text" name="query"
+                   placeholder="Search for a variant or phenotype">
+            <input type="submit" value="Search" style="display: none">
+        </form>
+    </div>
+
+{% endblock %}

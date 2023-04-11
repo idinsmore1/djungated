@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>UNGATED</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/typeahead.css' %}">
+    {% block headerblock %}{% endblock %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<nav class="navbar navbar-expand-sm navbar-dark bg-primary sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'home' %}">UNGATED</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <form class="w-25" id="searchbar" type="search" action="{% url 'go' %}" method="get" autocomplete="off">
+                <input class="form-control typeahead" type="text" name="query" placeholder="Search for a variant or phenotype">
+                <input type="submit" value="Search" style="display: none">
+            </form>
+        </div>
+    </div>
+    {#              <div class="d-flex w-25" role="search" id="searchbar">#}
+    {#                <input class="typeahead" type="text" placeholder="Search">#}
+    {#                <button class="btn btn-outline-success" type="submit">Search</button>#}
+    {#              </div>#}
+    {#              <ul class="navbar-nav me-auto mb-2 mb-lg-0">#}
+    {#                <li class="nav-item">#}
+    {#                  <a class="nav-link" href="{% url 'pheno_index' %}">GWAS</a>#}
+    {#                </li>#}
+    {#                <li class="nav-item">#}
+    {#                  <a class="nav-link" href="{% url 'variant_index' %}">PheWAS</a>#}
+    {#                <li class="nav-item dropdown">#}
+    {#                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">#}
+    {#                    Dropdown#}
+    {#                  </a>#}
+    {#                  <ul class="dropdown-menu">#}
+    {#                    <li><a class="dropdown-item" href="#">Action</a></li>#}
+    {#                    <li><a class="dropdown-item" href="#">Another action</a></li>#}
+    {#                    <li><hr class="dropdown-divider"></li>#}
+    {#                    <li><a class="dropdown-item" href="#">Something else here</a></li>#}
+    {#                  </ul>#}
+    {#                </li>#}
+    {#              </ul>#}
+    {#              <div class="d-flex me-4 navbar-text">#}
+    {#                    <a class="nav-link" href="#">Login</a>#}
+    {#              </div>#}
+    {#            </div>#}
+    {#        </div>#}
+</nav>
+<h1>This is a test page</h1>
+{% block page_content %}{% endblock %}
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/jquery-3.6.1.min.js' %}"></script>
+<script src="{% static 'js/typeahead.bundle.min.js' %}"></script>
+<script>
+    $(document).ready(function () {
+
+        let variants = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.whitespace,
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            // url points to a json file that contains an array of country names, see
+            // https://github.com/twitter/typeahead.js/blob/gh-pages/data/countries.json
+            prefetch: {
+                url: "{% static 'json/ungated_searchable_items.json' %}"
+            }
+        });
+        // passing in `null` for the `options` arguments will result in the default
+        // options being used
+        variants.clearPrefetchCache();
+        variants.initialize();
+        $('#searchbar .typeahead').typeahead({
+            hint: true,
+            highlight: true,
+            minLength: 1
+        }, {
+            name: 'variants',
+            source: variants,
+            templates: {
+                empty: [
+                    '<div class="empty-message">',
+                    'Unable to find any matching items',
+                    '</div>'
+                ].join('\n'),
+                suggestion: function (data) {
+                    return '<p>' + data + '</p>'
+                }
+            }
+        });
+    });
+</script>
+{% block end_content %}{% endblock %}
+</body>
+
+</html>
